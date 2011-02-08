@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>net.joshdevins.github.log4j</groupId>
+    <artifactId>scribe-log4j-appender</artifactId>
+    <version>1-SNAPSHOT</version>
+
+    <name>Scribe log4j Appender</name>
+    <url>https://github.com/joshdevins/Scribe-log4j-Appender</url>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include implementation="java.lang.String">src/main/java/**/*.java</include>
+                        <include implementation="java.lang.String">src/generated/java/**/*.java</include>
+                    </includes>
+
+                    <compilerVersion>${java.version}</compilerVersion>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${java.source.encoding}</encoding>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <optimize>false</optimize>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <properties>
+        <general.encoding>UTF-8</general.encoding>
+
+        <!-- JAVA -->
+        <java.version>1.6</java.version>
+        <java.source.encoding>${general.encoding}</java.source.encoding>
+    </properties>
+</project>
