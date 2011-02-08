@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.joshdevins.github.log4j</groupId>
+    <groupId>org.apache.log4j</groupId>
     <artifactId>scribe-log4j-appender</artifactId>
     <version>1-SNAPSHOT</version>
 
@@ -42,3 +42,4 @@
         <java.source.encoding>${general.encoding}</java.source.encoding>
     </properties>
 </project>
+
