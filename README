@@ -1,19 +1,28 @@
 Scribe log4j Appender
-====================================
-Much of this work is based on Alex Loddengaard (http://github.com/alexlod/scribe-log4j-appender).
+=====================
 
-I cleaned up his code to work in non-hadoop environments. I added support to reconnect if it loses a connection or if scribe goes away.
+History:
+Alex Loddengaard (http://github.com/alexlod/scribe-log4j-appender)
+ - original author
 
-You will need the following libraries for your project, which are in lib/ folder for convenience:
+Chris Goffinet (http://github.com/lenn0x/Scribe-log4j-Appender)
+ - cleaned up code to work in non-hadoop environments
+ - added support to reconnect if it loses a connection or if Scribe goes away
 
-./lib/libthrift-r808609.jar
-./lib/log4j-1.2.15.jar
-./lib/slf4j-api-1.5.8.jar
-./lib/slf4j-log4j12-1.5.8.jar
+Installation and Building
+-------------------------
 
-Example to enable in log4j:
+You will need the following libraries in your Maven local repository:
 
-# Add scribe to end of rootLogger:
+libthrift-r808609.jar
+log4j-1.2.15.jar
+slf4j-api-1.5.8.jar
+slf4j-log4j12-1.5.8.jar
+
+Example
+-------
+
+# Add scribe to end of rootLogger
 
 log4j.rootLogger=DEBUG,stdout,scribe
 
@@ -25,7 +34,7 @@ log4j.rootLogger=DEBUG,stdout,scribe
 #
 # You can also set the hostname if you do not want to rely on Java picking the correct hostname
 
-log4j.appender.scribe=org.apache.log4j.scribe.ScribeAppender
+log4j.appender.scribe=org.apache.log4j.net.ScribeAppender
 log4j.appender.scribe.scribe_category=MyScribeCategoryName
 log4j.appender.scribe.DatePattern='.'yyyy-MM-dd-HH
 log4j.appender.scribe.layout=org.apache.log4j.PatternLayout

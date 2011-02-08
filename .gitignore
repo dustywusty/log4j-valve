@@ -1,6 +1,1 @@
-*.class
-*.ipr
-*.iws
-out
-build
-*.iml
+target
