@@ -16,12 +16,9 @@ Chris Goffinet (http://github.com/lenn0x/Scribe-log4j-Appender)
 Running
 ---
 
-You will need the following libraries at runtime only:
+You will need the following libraries installed in your local Maven repository:
 
- * libthrift-r808609.jar
- * log4j-1.2.15.jar
- * slf4j-api-1.5.8.jar
- * slf4j-log4j12-1.5.8.jar
+ * [Thrift](http://thrift.apache.org)
 
 Configuration
 ---
