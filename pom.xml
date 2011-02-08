@@ -42,4 +42,3 @@
         <java.source.encoding>${general.encoding}</java.source.encoding>
     </properties>
 </project>
-
