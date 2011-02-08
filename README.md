@@ -24,17 +24,7 @@ slf4j-log4j12-1.5.8.jar
 Configuration
 ---
 
-# Add scribe to end of rootLogger
-
 log4j.rootLogger=DEBUG,stdout,scribe
-
-#
-# Add this to your log4j.properties
-#
-# You can adjust the scribe_host and scribe_port you want messages sent to by setting
-# scribe_host and scribe_port
-#
-# You can also set the hostname if you do not want to rely on Java picking the correct hostname
 
 log4j.appender.scribe=org.apache.log4j.net.ScribeAppender
 log4j.appender.scribe.scribe_category=MyScribeCategoryName
