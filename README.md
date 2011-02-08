@@ -5,9 +5,11 @@ History
 ---
 
 Alex Loddengaard (http://github.com/alexlod/scribe-log4j-appender)
+
  * original author
 
 Chris Goffinet (http://github.com/lenn0x/Scribe-log4j-Appender)
+
  * cleaned up code to work in non-hadoop environments
  * added support to reconnect if it loses a connection or if Scribe goes away
 
