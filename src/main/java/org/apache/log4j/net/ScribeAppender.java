@@ -17,71 +17,78 @@
  */
 package org.apache.log4j.net;
 
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TFramedTransport;
-import org.apache.thrift.transport.TTransportException;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.spi.LoggingEvent;
-import org.apache.log4j.spi.ThrowableInformation;
-import scribe.LogEntry;
-import scribe.scribe.Client;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.net.Socket;
 import java.io.IOException;
-
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ScribeAppender extends AppenderSkeleton {
+
     private List<LogEntry> logEntries;
 
     private String hostname;
+
     private String scribe_host = "127.0.0.1";
+
     private int scribe_port = 1463;
+
     private String scribe_category = "scribe";
 
     private Client client;
+
     private TFramedTransport transport;
 
-    public String getScribe_host() {
-        return scribe_host;
+    /*
+     * Appends a log message to Scribe
+     */
+    @Override
+    public void append(final LoggingEvent loggingEvent) {
+
+        synchronized (this) {
+
+            connect();
+
+            try {
+                StringBuffer stackTrace = new StringBuffer();
+                if (loggingEvent.getThrowableInformation() != null) {
+                    String[] stackTraceArray = loggingEvent.getThrowableInformation().getThrowableStrRep();
+
+                    String nextLine;
+
+                    for (String element : stackTraceArray) {
+                        nextLine = element + "\n";
+                        stackTrace.append(nextLine);
+                    }
+                }
+                String message = String
+                        .format("%s %s %s", hostname, layout.format(loggingEvent), stackTrace.toString());
+                LogEntry entry = new LogEntry(scribe_category, message);
+
+                logEntries.add(entry);
+                client.Log(logEntries);
+            } catch (TTransportException e) {
+                transport.close();
+            } catch (Exception e) {
+                System.err.println(e);
+            } finally {
+                logEntries.clear();
+            }
+        }
     }
 
-    public void setScribe_host(String scribe_host) {
-        this.scribe_host = scribe_host;
+    public void close() {
+
+        if (transport != null && transport.isOpen()) {
+            transport.close();
+        }
     }
 
-    public int getScribe_port() {
-        return scribe_port;
-    }
+    public void configureScribe() {
 
-    public void setScribe_port(int scribe_port) {
-        this.scribe_port = scribe_port;
-    }
-
-    public String getScribe_category() {
-        return scribe_category;
-    }
-
-    public void setScribe_category(String scribe_category) {
-        this.scribe_category = scribe_category;
-    }
-
-    public String getHostname() {
-        return hostname;
-    }
-
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
-    }
-
-
-public void configureScribe() {
         try {
-            synchronized(this) {
+            synchronized (this) {
                 if (hostname == null) {
                     try {
                         hostname = InetAddress.getLocalHost().getCanonicalHostName();
@@ -109,62 +116,54 @@ public void configureScribe() {
     }
 
     /*
-    * Appends a log message to Scribe
-    */
-    @Override
-    public void append(LoggingEvent loggingEvent) {
-        synchronized(this) {
-
-            connect();
-
-            try {
-                StringBuffer stackTrace = new StringBuffer();
-                if (loggingEvent.getThrowableInformation() != null) {
-                    String[] stackTraceArray = loggingEvent.getThrowableInformation().getThrowableStrRep();
-
-                    String nextLine;
-
-                    for (int i = 0; i < stackTraceArray.length; i++) {
-                      nextLine = stackTraceArray[i] + "\n";
-                      stackTrace.append(nextLine);
-                    }
-                }
-                String message = String.format("%s %s %s", hostname, layout.format(loggingEvent), stackTrace.toString());
-                LogEntry entry = new LogEntry(scribe_category, message);
-
-                logEntries.add(entry);
-                client.Log(logEntries);
-            } catch (TTransportException e) {
-                transport.close();
-            } catch (Exception e) {
-                System.err.println(e);
-            } finally {
-                logEntries.clear();
-            }
-        }
-    }
-    /*
-    * Connect to scribe if not open, reconnect if failed.
-    */
+     * Connect to scribe if not open, reconnect if failed.
+     */
     public void connect() {
-        if (transport != null && transport.isOpen())
-            return;
 
-        if (transport != null && transport.isOpen() == false)
-        {
+        if (transport != null && transport.isOpen()) {
+            return;
+        }
+
+        if (transport != null && transport.isOpen() == false) {
             transport.close();
 
         }
         configureScribe();
     }
 
-    public void close() {
-        if (transport != null && transport.isOpen()) {
-            transport.close();
-        }
+    public String getHostname() {
+        return hostname;
+    }
+
+    public String getScribe_category() {
+        return scribe_category;
+    }
+
+    public String getScribe_host() {
+        return scribe_host;
+    }
+
+    public int getScribe_port() {
+        return scribe_port;
     }
 
     public boolean requiresLayout() {
         return true;
+    }
+
+    public void setHostname(final String hostname) {
+        this.hostname = hostname;
+    }
+
+    public void setScribe_category(final String scribe_category) {
+        this.scribe_category = scribe_category;
+    }
+
+    public void setScribe_host(final String scribe_host) {
+        this.scribe_host = scribe_host;
+    }
+
+    public void setScribe_port(final int scribe_port) {
+        this.scribe_port = scribe_port;
     }
 }
