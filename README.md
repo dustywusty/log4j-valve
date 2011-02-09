@@ -15,9 +15,11 @@ History
 
 [Josh Devins](http://github.com/joshdevins/Scribe-log4j-Appender)
 
- * reorganized
+ * reorganized and refactored
  * removed checked in libs and provided basic Maven pom
  * regenerated Thrift classes and manually removed dependency on SLF4J
+ * added better error reporting through log4j
+ * added test cases
 
 Building
 ---
