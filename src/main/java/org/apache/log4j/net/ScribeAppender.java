@@ -26,154 +26,213 @@ import java.util.List;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
+import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransportException;
 
 import com.facebook.scribe.thrift.LogEntry;
+import com.facebook.scribe.thrift.ResultCode;
 import com.facebook.scribe.thrift.scribe.Client;
 
+/**
+ * A basic log4j appender for sending log messages to a remote Scribe instance. The logic in
+ * {@link #append(LoggingEvent)} will drop any log events that fail to be sent to Scribe. All failures are handled by
+ * log4j error handling mechanism which should log to the backup appender if defined or STDERR if there is no backup
+ * appender.
+ * 
+ * <p>
+ * This is based on previous Scribe appenders as well as the built-in log4j appenders like {@link JMSAppender} and
+ * {@link SyslogAppender}.
+ * </p>
+ * 
+ * @see http://github.com/alexlod/scribe-log4j-appender
+ * @see http://github.com/lenn0x/Scribe-log4j-Appender
+ * 
+ * @author Josh Devins
+ */
 public class ScribeAppender extends AppenderSkeleton {
 
-    private List<LogEntry> logEntries;
+    public static final String DEFAULT_REMOTE_HOST = "127.0.0.1";
 
-    private String hostname;
+    public static final int DEFAULT_REMOTE_PORT = 1463;
 
-    private String scribe_host = "127.0.0.1";
+    private static final String DEFAULT_CATEGORY = "default";
 
-    private int scribe_port = 1463;
+    private String remoteHost = DEFAULT_REMOTE_HOST;
 
-    private String scribe_category = "scribe";
+    private int remotePort = DEFAULT_REMOTE_PORT;
+
+    private String category = DEFAULT_CATEGORY;
+
+    private String localHostname;
 
     private Client client;
 
     private TFramedTransport transport;
 
-    /*
-     * Appends a log message to Scribe
+    /**
+     * Appends a log message to remote Scribe server. This is currently made thread safe by synchronizing this method,
+     * however this is not very efficient and should be refactored.
+     * 
+     * TODO: Refactor for better effeciency and thread safety
      */
     @Override
-    public void append(final LoggingEvent loggingEvent) {
+    public synchronized void append(final LoggingEvent event) {
 
-        synchronized (this) {
-
-            connect();
-
-            try {
-                StringBuffer stackTrace = new StringBuffer();
-                if (loggingEvent.getThrowableInformation() != null) {
-                    String[] stackTraceArray = loggingEvent.getThrowableInformation().getThrowableStrRep();
-
-                    String nextLine;
-
-                    for (String element : stackTraceArray) {
-                        nextLine = element + "\n";
-                        stackTrace.append(nextLine);
-                    }
-                }
-                String message = String
-                        .format("%s %s %s", hostname, layout.format(loggingEvent), stackTrace.toString());
-                LogEntry entry = new LogEntry(scribe_category, message);
-
-                logEntries.add(entry);
-                client.Log(logEntries);
-            } catch (TTransportException e) {
-                transport.close();
-            } catch (Exception e) {
-                System.err.println(e);
-            } finally {
-                logEntries.clear();
-            }
-        }
-    }
-
-    public void close() {
-
-        if (transport != null && transport.isOpen()) {
-            transport.close();
-        }
-    }
-
-    public void configureScribe() {
-
-        try {
-            synchronized (this) {
-                if (hostname == null) {
-                    try {
-                        hostname = InetAddress.getLocalHost().getCanonicalHostName();
-                    } catch (UnknownHostException e) {
-                        // can't get hostname
-                    }
-                }
-
-                // Thrift boilerplate code
-                logEntries = new ArrayList<LogEntry>(1);
-                TSocket sock = new TSocket(new Socket(scribe_host, scribe_port));
-                transport = new TFramedTransport(sock);
-                TBinaryProtocol protocol = new TBinaryProtocol(transport, false, false);
-                client = new Client(protocol, protocol);
-            }
-        } catch (TTransportException e) {
-            System.err.println(e);
-        } catch (UnknownHostException e) {
-            System.err.println(e);
-        } catch (IOException e) {
-            System.err.println(e);
-        } catch (Exception e) {
-            System.err.println(e);
-        }
-    }
-
-    /*
-     * Connect to scribe if not open, reconnect if failed.
-     */
-    public void connect() {
-
-        if (transport != null && transport.isOpen()) {
+        boolean connected = connectIfNeeded();
+        if (!connected) {
             return;
         }
 
-        if (transport != null && transport.isOpen() == false) {
+        findAndSetLocalHostnameIfNeeded();
+
+        try {
+
+            String stackTrace = null;
+            if (event.getThrowableInformation() != null) {
+
+                StringBuilder sb = new StringBuilder();
+                String[] stackTraceArray = event.getThrowableInformation().getThrowableStrRep();
+                for (int i = 0; i < stackTraceArray.length; i++) {
+
+                    sb.append(stackTraceArray[i]);
+
+                    if (i > stackTraceArray.length - 1) {
+                        // newlines will mess up processing in Hadoop if we assume each log entry is on a new line
+                        sb.append('\t');
+                    }
+                }
+
+                stackTrace = sb.toString();
+            }
+
+            // build log message to send with or without stack trace
+            String message = String.format("[%s] %s (%s)", localHostname, layout.format(event), stackTrace);
+
+            // log it to the client
+            List<LogEntry> logEntries = new ArrayList<LogEntry>(1);
+            logEntries.add(new LogEntry(category, message));
+
+            ResultCode resultCode = client.Log(logEntries);
+
+            // drop the message if Scribe can't handle it, this should end up in the backup appender
+            if (ResultCode.TRY_LATER == resultCode) {
+
+                // nicely formatted for batch processing
+                getErrorHandler().error("TRY_LATER [" + message + "]");
+            }
+
+        } catch (TException e) {
             transport.close();
+            handleError("TException on log attempt", e);
 
+        } catch (Exception e) {
+            handleError("Unhandled Exception on log attempt", e);
         }
-        configureScribe();
     }
 
-    public String getHostname() {
-        return hostname;
+    /**
+     * Close transport if open.
+     */
+    @Override
+    public synchronized void close() {
+
+        if (isConnected()) {
+            transport.close();
+        }
     }
 
-    public String getScribe_category() {
-        return scribe_category;
-    }
-
-    public String getScribe_host() {
-        return scribe_host;
-    }
-
-    public int getScribe_port() {
-        return scribe_port;
+    public synchronized boolean isConnected() {
+        return transport != null && transport.isOpen();
     }
 
     public boolean requiresLayout() {
         return true;
     }
 
-    public void setHostname(final String hostname) {
-        this.hostname = hostname;
+    public void setCategory(final String category) {
+        this.category = category;
     }
 
-    public void setScribe_category(final String scribe_category) {
-        this.scribe_category = scribe_category;
+    public void setLocalHostname(final String localHostname) {
+        this.localHostname = localHostname;
     }
 
-    public void setScribe_host(final String scribe_host) {
-        this.scribe_host = scribe_host;
+    public void setPort(final int remotePort) {
+        this.remotePort = remotePort;
     }
 
-    public void setScribe_port(final int scribe_port) {
-        this.scribe_port = scribe_port;
+    public void setRemoteHost(final String remoteHost) {
+        this.remoteHost = remoteHost;
+    }
+
+    /**
+     * Connect to Scribe if not open, reconnecting if a previous connection has failed.
+     * 
+     * @return connection success
+     */
+    private boolean connectIfNeeded() {
+
+        if (isConnected()) {
+            return true;
+        }
+
+        // connection was dropped, needs to be reopened
+        if (transport != null && !transport.isOpen()) {
+            transport.close();
+        }
+
+        try {
+            establishConnection();
+            return true;
+
+        } catch (TTransportException e) {
+            handleError("TTransportException on connect", e);
+
+        } catch (UnknownHostException e) {
+            handleError("UnknownHostException on connect", e);
+
+        } catch (IOException e) {
+            handleError("IOException on connect", e);
+
+        } catch (Exception e) {
+            handleError("Unhandled Exception on connect", e);
+        }
+
+        return false;
+    }
+
+    /**
+     * Thrift boilerplate connection code. No error handling is attempted and all excetions are passed back up.
+     */
+    private void establishConnection() throws TTransportException, UnknownHostException, IOException {
+
+        TSocket sock = new TSocket(new Socket(remoteHost, remotePort));
+        transport = new TFramedTransport(sock);
+
+        TBinaryProtocol protocol = new TBinaryProtocol(transport, false, false);
+        client = new Client(protocol, protocol);
+    }
+
+    /**
+     * If no {@link #localHostname} has been set, this will attempt to set it.
+     */
+    private void findAndSetLocalHostnameIfNeeded() {
+
+        if (localHostname == null || localHostname.isEmpty()) {
+            try {
+                localHostname = InetAddress.getLocalHost().getCanonicalHostName();
+            } catch (UnknownHostException e) {
+                // can't get hostname
+            }
+        }
+    }
+
+    private void handleError(final String failure, final Exception e) {
+
+        // error code is not used
+        getErrorHandler().error("Failure in ScribeAppender: name=[" + name + "], failure=[" + failure + "]", e, 0);
     }
 }
