@@ -1,5 +1,3 @@
-#!/usr/local/bin/thrift --cpp --php
-
 ##  Copyright (c) 2007-2008 Facebook
 ##
 ##  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,10 +15,9 @@
 ## See accompanying file LICENSE or visit the Scribe site at:
 ## http://developers.facebook.com/scribe/
 
-include "fb303/if/fb303.thrift"
+include "fb303.thrift"
 
-namespace cpp scribe.thrift
-namespace java scribe
+namespace java com.facebook.scribe.thrift
 
 enum ResultCode
 {
@@ -38,3 +35,4 @@ service scribe extends fb303.FacebookService
 {
   ResultCode Log(1: list<LogEntry> messages);
 }
+

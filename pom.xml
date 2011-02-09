@@ -17,11 +17,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <includes>
-                        <include implementation="java.lang.String">src/main/java/**/*.java</include>
-                        <include implementation="java.lang.String">src/generated/java/**/*.java</include>
-                    </includes>
-
                     <compilerVersion>${java.version}</compilerVersion>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -39,12 +34,7 @@
         <dependency>
             <groupId>org.apache.thrift</groupId>
             <artifactId>thrift</artifactId>
-            <version>0.5.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.1</version>
+            <version>0.6.0</version>
         </dependency>
 
         <!-- STANDARD -->

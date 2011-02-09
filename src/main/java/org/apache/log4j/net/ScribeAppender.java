@@ -31,6 +31,9 @@ import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransportException;
 
+import com.facebook.scribe.thrift.LogEntry;
+import com.facebook.scribe.thrift.scribe.Client;
+
 public class ScribeAppender extends AppenderSkeleton {
 
     private List<LogEntry> logEntries;

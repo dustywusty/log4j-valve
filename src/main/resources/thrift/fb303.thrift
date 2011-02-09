@@ -21,9 +21,7 @@
  * fb303.thrift
  */
 
-namespace java com.facebook.fb303
-namespace cpp facebook.fb303
-namespace perl Facebook.FB303
+namespace java com.facebook.scribe.thrift.fb303
 
 /**
  * Common status reporting mechanism across all services
@@ -110,3 +108,4 @@ service FacebookService {
   oneway void shutdown(),
 
 }
+
