@@ -43,5 +43,5 @@ Configuration
 
 	log4j.appender.scribe.DatePattern=yyyy-MM-dd-HH
 	log4j.appender.scribe.layout=org.apache.log4j.PatternLayout
-	log4j.appender.scribe.layout.ConversionPattern=%5p [%t] %d{ISO8601} %F (%L) %m%n
+	log4j.appender.scribe.layout.ConversionPattern=%5p %d{ISO8601} %m # do NOT use %n unless you want a newline to be transmitted to Scribe
 
