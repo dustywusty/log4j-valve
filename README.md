@@ -4,14 +4,20 @@ Scribe log4j Appender
 History
 ---
 
-Alex Loddengaard (http://github.com/alexlod/scribe-log4j-appender)
+[Alex Loddengaard](http://github.com/alexlod/scribe-log4j-appender)
 
  * original author
 
-Chris Goffinet (http://github.com/lenn0x/Scribe-log4j-Appender)
+[Chris Goffinet](http://github.com/lenn0x/Scribe-log4j-Appender)
 
- * cleaned up code to work in non-hadoop environments
+ * cleaned up code to work in non-Hadoop environments
  * added support to reconnect if it loses a connection or if Scribe goes away
+
+[Josh Devins](http://github.com/joshdevins/Scribe-log4j-Appender)
+
+ * reorganized
+ * removed checked in libs and provided basic Maven pom
+ * regenerated Thrift classes and manually removed dependency on SLF4J
 
 Running
 ---
