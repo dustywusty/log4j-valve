@@ -32,8 +32,14 @@ Configuration
 	log4j.rootLogger=DEBUG,stdout,scribe
 	
 	log4j.appender.scribe=org.apache.log4j.net.ScribeAppender
-	log4j.appender.scribe.scribe_category=MyScribeCategoryName
-	log4j.appender.scribe.DatePattern='.'yyyy-MM-dd-HH
+
+	# optional properties
+	log4j.appender.scribe.category=default
+	log4j.appender.scribe.remoteHost=127.0.0.1
+	log4j.appender.scribe.remoteHost=1463
+	log4j.appender.scribe.localHostname=app01.host.com # canonical hostname will be looked up if not provided
+
+	log4j.appender.scribe.DatePattern=yyyy-MM-dd-HH
 	log4j.appender.scribe.layout=org.apache.log4j.PatternLayout
-	log4j.appender.scribe.layout.ConversionPattern=%5p [%t] %d{ISO8601} %F (line %L) %m%n
+	log4j.appender.scribe.layout.ConversionPattern=%5p [%t] %d{ISO8601} %F (%L) %m%n
 
