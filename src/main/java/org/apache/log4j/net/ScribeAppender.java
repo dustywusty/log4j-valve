@@ -144,6 +144,22 @@ public class ScribeAppender extends AppenderSkeleton {
         }
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public String getLocalHostname() {
+        return localHostname;
+    }
+
+    public String getRemoteHost() {
+        return remoteHost;
+    }
+
+    public Object getRemotePort() {
+        return remotePort;
+    }
+
     public synchronized boolean isConnected() {
         return transport != null && transport.isOpen();
     }
@@ -153,6 +169,8 @@ public class ScribeAppender extends AppenderSkeleton {
     }
 
     public void setCategory(final String category) {
+
+        Validate.notEmptyString(category, "Category must not be empty");
         this.category = category;
     }
 
@@ -160,12 +178,16 @@ public class ScribeAppender extends AppenderSkeleton {
         this.localHostname = localHostname;
     }
 
-    public void setPort(final int remotePort) {
-        this.remotePort = remotePort;
+    public void setRemoteHost(final String remoteHost) {
+
+        Validate.notEmptyString(category, "Remote host must not be empty");
+        this.remoteHost = remoteHost;
     }
 
-    public void setRemoteHost(final String remoteHost) {
-        this.remoteHost = remoteHost;
+    public void setRemotePort(final int remotePort) {
+
+        Validate.positiveInteger(remotePort, "Remote port must at least be a positive integer");
+        this.remotePort = remotePort;
     }
 
     /**
