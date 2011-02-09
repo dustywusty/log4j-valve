@@ -19,12 +19,12 @@ History
  * removed checked in libs and provided basic Maven pom
  * regenerated Thrift classes and manually removed dependency on SLF4J
 
-Running
+Building
 ---
 
-You will need the following libraries installed in your local Maven repository:
+You will need the following libraries installed in your Maven repository:
 
- * [Thrift](http://thrift.apache.org)
+ * [Thrift](http://thrift.apache.org) - 0.6.0
 
 Configuration
 ---
