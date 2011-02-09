@@ -17,7 +17,7 @@ History
 
  * reorganized and refactored
  * removed checked in libs and provided basic Maven pom
- * regenerated Thrift classes and manually removed dependency on SLF4J
+ * regenerated Thrift classes (just in case)
  * added better error reporting through log4j
  * added test cases
 

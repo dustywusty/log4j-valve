@@ -81,36 +81,18 @@ public class ScribeAppender extends AppenderSkeleton {
     @Override
     public synchronized void append(final LoggingEvent event) {
 
+        String message = buildMessage(event);
+
         boolean connected = connectIfNeeded();
+
         if (!connected) {
+            getErrorHandler().error("DROP - no connection: " + message);
             return;
         }
 
         findAndSetLocalHostnameIfNeeded();
 
         try {
-
-            String stackTrace = null;
-            if (event.getThrowableInformation() != null) {
-
-                StringBuilder sb = new StringBuilder();
-                String[] stackTraceArray = event.getThrowableInformation().getThrowableStrRep();
-                for (int i = 0; i < stackTraceArray.length; i++) {
-
-                    sb.append(stackTraceArray[i]);
-
-                    if (i > stackTraceArray.length - 1) {
-                        // newlines will mess up processing in Hadoop if we assume each log entry is on a new line
-                        sb.append('\t');
-                    }
-                }
-
-                stackTrace = sb.toString();
-            }
-
-            // build log message to send with or without stack trace
-            String message = String.format("[%s] %s (%s)", localHostname, layout.format(event), stackTrace);
-
             // log it to the client
             List<LogEntry> logEntries = new ArrayList<LogEntry>(1);
             logEntries.add(new LogEntry(category, message));
@@ -121,7 +103,7 @@ public class ScribeAppender extends AppenderSkeleton {
             if (ResultCode.TRY_LATER == resultCode) {
 
                 // nicely formatted for batch processing
-                getErrorHandler().error("TRY_LATER [" + message + "]");
+                getErrorHandler().error("DROP - TRY_LATER: " + message);
             }
 
         } catch (TException e) {
@@ -188,6 +170,39 @@ public class ScribeAppender extends AppenderSkeleton {
 
         Validate.positiveInteger(remotePort, "Remote port must at least be a positive integer");
         this.remotePort = remotePort;
+    }
+
+    private String buildMessage(final LoggingEvent event) {
+
+        String stackTrace = null;
+        if (event.getThrowableInformation() != null) {
+
+            StringBuilder sb = new StringBuilder();
+            String[] stackTraceArray = event.getThrowableInformation().getThrowableStrRep();
+            for (int i = 0; i < stackTraceArray.length; i++) {
+
+                sb.append(stackTraceArray[i]);
+
+                if (i > stackTraceArray.length - 1) {
+                    // newlines will mess up processing in Hadoop if we assume each log entry is on a new line
+                    sb.append('\t');
+                }
+            }
+
+            stackTrace = sb.toString();
+        }
+
+        // no null local hostnames, just leave empty if can't be found
+        if (localHostname == null) {
+            localHostname = "";
+        }
+
+        // build log message to send with or without stack trace
+        if (stackTrace == null) {
+            return String.format("[%s] %s", localHostname, layout.format(event), stackTrace);
+        }
+
+        return String.format("[%s] %s (%s)", localHostname, layout.format(event), stackTrace);
     }
 
     /**
