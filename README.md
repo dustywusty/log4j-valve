@@ -36,12 +36,13 @@ Configuration
 	log4j.appender.scribe=org.apache.log4j.net.ScribeAppender
 
 	# optional properties
+        # canonical hostname will be looked up if not provided in localHostname
 	log4j.appender.scribe.category=default
 	log4j.appender.scribe.remoteHost=127.0.0.1
 	log4j.appender.scribe.remoteHost=1463
-	log4j.appender.scribe.localHostname=app01.host.com # canonical hostname will be looked up if not provided
+	log4j.appender.scribe.localHostname=app01.host.com
 
-	log4j.appender.scribe.DatePattern=yyyy-MM-dd-HH
+	# do NOT use a trailing %n unless you want a newline to be transmitted to Scribe after every message
 	log4j.appender.scribe.layout=org.apache.log4j.PatternLayout
-	log4j.appender.scribe.layout.ConversionPattern=%5p %d{ISO8601} %m # do NOT use %n unless you want a newline to be transmitted to Scribe
+	log4j.appender.scribe.layout.ConversionPattern=%5p %d{ISO8601} %m
 

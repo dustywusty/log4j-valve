@@ -270,6 +270,8 @@ public class ScribeAppender extends AppenderSkeleton {
     private void handleError(final String failure, final Exception e) {
 
         // error code is not used
-        getErrorHandler().error("Failure in ScribeAppender: name=[" + name + "], failure=[" + failure + "]", e, 0);
+        getErrorHandler().error(
+                "Failure in ScribeAppender: name=[" + name + "], failure=[" + failure + "], exception=["
+                        + e.getMessage() + "]");
     }
 }

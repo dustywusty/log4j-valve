@@ -9,6 +9,7 @@ import org.apache.log4j.spi.ErrorHandler;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 public class ScribeAppenderTest {
@@ -32,11 +33,17 @@ public class ScribeAppenderTest {
     }
 
     @Test
-    public void testAppend() {
+    public void testAppend_NoConnection() {
 
         append("message");
 
+        // there should be nothing running on port 0 anyways
+        appender.setRemotePort(0);
+
         Mockito.verify(mockErrorHandler).error("DROP - no connection: [] INFO - message");
+        Mockito.verify(mockErrorHandler).error(Matchers.contains("Connection refused"));
+
+        Mockito.verifyNoMoreInteractions(mockErrorHandler);
     }
 
     @Test
