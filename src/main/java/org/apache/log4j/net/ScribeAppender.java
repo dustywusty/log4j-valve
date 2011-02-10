@@ -179,14 +179,10 @@ public class ScribeAppender extends AppenderSkeleton {
 
             StringBuilder sb = new StringBuilder();
             String[] stackTraceArray = event.getThrowableInformation().getThrowableStrRep();
-            for (int i = 0; i < stackTraceArray.length; i++) {
 
+            // first two lines of stack trace only
+            for (int i = 0; i < 2; i++) {
                 sb.append(stackTraceArray[i]);
-
-                if (i > stackTraceArray.length - 1) {
-                    // newlines will mess up processing in Hadoop if we assume each log entry is on a new line
-                    sb.append('\t');
-                }
             }
 
             stackTrace = sb.toString();

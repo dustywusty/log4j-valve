@@ -73,12 +73,13 @@ public class ScribeAppenderTest {
     @Test
     public void testAppend_NoConnection() {
 
-        append("message");
+        // there should be nothing running on port 1 anyways
+        appender.setRemotePort(1);
+        appender.setLocalHostname("localHostname");
 
-        // there should be nothing running on port 0 anyways
-        appender.setRemotePort(0);
+        append("test message");
 
-        Mockito.verify(mockErrorHandler).error("DROP - no connection: [] INFO - message");
+        Mockito.verify(mockErrorHandler).error("DROP - no connection: [localHostname] INFO - test message");
         Mockito.verify(mockErrorHandler).error(Matchers.contains("Connection refused"));
     }
 
@@ -88,15 +89,55 @@ public class ScribeAppenderTest {
     }
 
     @Test
-    public void testLogEvent() throws IOException, TException {
+    public void testRemoteAppend_Ok() throws IOException, TException {
 
         startService();
 
-        setupLogMock("default", "test message");
-
+        setupScribeMock("test message");
         append("test message");
 
         stopService();
+    }
+
+    @Test
+    public void testRemoteAppend_OkTwice() throws IOException, TException {
+
+        startService();
+
+        setupScribeMock("test message");
+        append("test message");
+        append("test message");
+
+        stopService();
+    }
+
+    @Test
+    public void testRemoteAppend_ReconnectionWithFailure() throws IOException, TException {
+
+        // success on the first try
+        testRemoteAppend_Ok();
+
+        // fail on the second try
+        appender.close();
+        testAppend_NoConnection();
+
+        // success again on the next try
+        startService();
+        append("test message");
+        stopService();
+    }
+
+    @Test
+    public void testRemoteAppend_TryLater() throws IOException, TException {
+
+        startService();
+
+        setupScribeMock("default", "test message", ResultCode.TRY_LATER);
+        append("test message");
+
+        stopService();
+
+        Mockito.verify(mockErrorHandler).error("DROP - TRY_LATER: [localHostname] INFO - test message");
     }
 
     @Test
@@ -121,14 +162,17 @@ public class ScribeAppenderTest {
         appender.append(event);
     }
 
-    private void setupLogMock(final String category, final String message) throws TException {
-        setupLogMock(category, message, ResultCode.OK);
+    private void setupScribeMock(final String message) throws TException {
+        setupScribeMock("default", message, ResultCode.OK);
     }
 
-    private void setupLogMock(final String category, final String message, final ResultCode resultCode)
+    private void setupScribeMock(final String category, final String message, final ResultCode resultCode)
             throws TException {
 
-        Mockito.when(mockScribeIface.Log(Matchers.argThat(new LogEntryMatcher(category, message)))).thenReturn(
+        appender.setLocalHostname("localHostname");
+        Mockito.when(
+                mockScribeIface.Log(Matchers
+                        .argThat(new LogEntryMatcher(category, "localHostname", Level.INFO, message)))).thenReturn(
                 resultCode);
     }
 
