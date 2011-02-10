@@ -31,18 +31,24 @@ You will need the following libraries installed in your Maven repository:
 Configuration
 ---
 
-	log4j.rootLogger=DEBUG,stdout,scribe
+	log4j.rootLogger=INFO, stdout, scribe
 	
-	log4j.appender.scribe=org.apache.log4j.net.ScribeAppender
+	# stdout/console appender
+	log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+	log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+	log4j.appender.stdout.layout.ConversionPattern=%5p [%t] (%F:%L) - %m%n
 
-	# optional properties
-	# canonical hostname will be looked up if not provided in localHostname
-	log4j.appender.scribe.category=default
-	log4j.appender.scribe.remoteHost=127.0.0.1
-	log4j.appender.scribe.remoteHost=1463
-	log4j.appender.scribe.localHostname=app01.host.com
+	# Scribe appender
+	log4j.appender.scribe=org.apache.log4j.net.ScribeAppender
 
 	# do NOT use a trailing %n unless you want a newline to be transmitted to Scribe after every message
 	log4j.appender.scribe.layout=org.apache.log4j.PatternLayout
-	log4j.appender.scribe.layout.ConversionPattern=%5p %d{ISO8601} %m
+	log4j.appender.scribe.layout.ConversionPattern=%d{ISO8601} %m
+
+	# optional properties
+	# canonical hostname will be looked up if not provided in localHostname
+	log4j.appender.scribe.category=application.appender.category
+	log4j.appender.scribe.remoteHost=127.0.0.1
+	log4j.appender.scribe.remoteHost=1463
+	log4j.appender.scribe.localHostname=app01.host.com
 
