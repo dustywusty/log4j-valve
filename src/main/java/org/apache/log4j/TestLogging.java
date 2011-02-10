@@ -10,6 +10,24 @@ package org.apache.log4j;
  * <li>(optional) exception message to log (quoted)</li>
  * </ul>
  * 
+ * <p>
+ * Easiest way to get here is to build an all-in-one jar with the Maven Assembly plugin:
+ * 
+ * <pre>
+ * mvn assembly:assmebly
+ * </pre>
+ * 
+ * </p>
+ * 
+ * <p>
+ * Now just create a <code>log4j.properties</code> file somewhere and reference it on your classpath:
+ * 
+ * <pre>
+ * java -cp target/scribe-log4j-appender-1-jar-with-dependencies.jar:src/test/resources org.apache.log4j.TestLogging info "here is the test message"
+ * </pre>
+ * 
+ * </p>
+ * 
  * @author Josh Devins
  */
 public class TestLogging {
