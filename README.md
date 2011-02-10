@@ -49,6 +49,6 @@ Configuration
 	# canonical hostname will be looked up if not provided in localHostname
 	log4j.appender.scribe.category=application.appender.category
 	log4j.appender.scribe.remoteHost=127.0.0.1
-	log4j.appender.scribe.remoteHost=1463
+	log4j.appender.scribe.remotePort=1463
 	log4j.appender.scribe.localHostname=app01.host.com
 
