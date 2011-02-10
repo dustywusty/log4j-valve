@@ -36,7 +36,7 @@ Configuration
 	log4j.appender.scribe=org.apache.log4j.net.ScribeAppender
 
 	# optional properties
-        # canonical hostname will be looked up if not provided in localHostname
+	# canonical hostname will be looked up if not provided in localHostname
 	log4j.appender.scribe.category=default
 	log4j.appender.scribe.remoteHost=127.0.0.1
 	log4j.appender.scribe.remoteHost=1463
