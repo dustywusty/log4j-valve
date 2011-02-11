@@ -60,6 +60,8 @@ public class ScribeAppender extends AppenderSkeleton {
 
     private static final String DEFAULT_CATEGORY = "default";
 
+    private static final int DEFAULT_STACK_TRACE_DEPTH = 1;
+
     private String remoteHost = DEFAULT_REMOTE_HOST;
 
     private int remotePort = DEFAULT_REMOTE_PORT;
@@ -67,6 +69,8 @@ public class ScribeAppender extends AppenderSkeleton {
     private String category = DEFAULT_CATEGORY;
 
     private String localHostname;
+
+    private int stackTraceDepth = DEFAULT_STACK_TRACE_DEPTH;
 
     private Client client;
 
@@ -142,6 +146,10 @@ public class ScribeAppender extends AppenderSkeleton {
         return remotePort;
     }
 
+    public int getStackTraceDepth() {
+        return stackTraceDepth;
+    }
+
     public synchronized boolean isConnected() {
         return transport != null && transport.isOpen();
     }
@@ -172,6 +180,12 @@ public class ScribeAppender extends AppenderSkeleton {
         this.remotePort = remotePort;
     }
 
+    public void setStackTraceDepth(final int stackTraceDepth) {
+
+        Validate.positiveInteger(stackTraceDepth, "Stack trace depth must be a positive integer");
+        this.stackTraceDepth = stackTraceDepth;
+    }
+
     private String buildMessage(final LoggingEvent event) {
 
         String stackTrace = null;
@@ -180,9 +194,16 @@ public class ScribeAppender extends AppenderSkeleton {
             StringBuilder sb = new StringBuilder();
             String[] stackTraceArray = event.getThrowableInformation().getThrowableStrRep();
 
-            // first two lines of stack trace only
-            for (int i = 0; i < 2; i++) {
+            // first n lines of stack trace only
+            for (int i = 0; i < stackTraceDepth + 1; i++) {
                 sb.append(stackTraceArray[i]);
+
+                if (i <= stackTraceDepth) {
+
+                    // separate stack trace with something other than newline
+                    // newlines will hoop us in Hadoop if we process per line
+                    sb.append('|');
+                }
             }
 
             stackTrace = sb.toString();
@@ -198,7 +219,7 @@ public class ScribeAppender extends AppenderSkeleton {
             return String.format("[%s] %s", localHostname, layout.format(event), stackTrace);
         }
 
-        return String.format("[%s] %s (%s)", localHostname, layout.format(event), stackTrace);
+        return String.format("[%s] %s {%s}", localHostname, layout.format(event), stackTrace);
     }
 
     /**
@@ -254,7 +275,7 @@ public class ScribeAppender extends AppenderSkeleton {
      */
     private void findAndSetLocalHostnameIfNeeded() {
 
-        if (localHostname == null || localHostname.isEmpty()) {
+        if (localHostname == null) {
             try {
                 localHostname = InetAddress.getLocalHost().getCanonicalHostName();
             } catch (UnknownHostException e) {

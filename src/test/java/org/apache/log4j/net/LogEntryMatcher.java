@@ -2,9 +2,9 @@ package org.apache.log4j.net;
 
 import java.util.List;
 
-import org.apache.log4j.Level;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 
 import com.facebook.scribe.thrift.LogEntry;
 
@@ -12,16 +12,12 @@ public class LogEntryMatcher extends BaseMatcher<List<LogEntry>> {
 
     private final String category;
 
-    private final String message;
+    private final Matcher<String> messageMatcher;
 
-    LogEntryMatcher(final String category, final String message) {
-        this(category, "", Level.INFO, message);
-    }
-
-    LogEntryMatcher(final String category, final String localHostname, final Level level, final String message) {
+    LogEntryMatcher(final String category, final Matcher<String> messageMatcher) {
 
         this.category = category;
-        this.message = "[" + localHostname + "] " + level + " - " + message;
+        this.messageMatcher = messageMatcher;
     }
 
     @Override
@@ -52,7 +48,7 @@ public class LogEntryMatcher extends BaseMatcher<List<LogEntry>> {
 
         LogEntry logEntry = (LogEntry) item;
 
-        boolean matches = logEntry.getCategory().equals(category) && logEntry.getMessage().equals(message);
+        boolean matches = logEntry.getCategory().equals(category) && messageMatcher.matches(logEntry.getMessage());
 
         if (!matches) {
             doesntMatch("category and message don't match; logEntry=" + logEntry.toString());
@@ -62,7 +58,7 @@ public class LogEntryMatcher extends BaseMatcher<List<LogEntry>> {
     }
 
     private void doesntMatch(final String reason) {
-        throw new IllegalArgumentException("Matcher failed. Local state: category=" + category + ", message=" + message
-                + ", reason=[" + reason + "]");
+        throw new IllegalArgumentException("Matcher failed. Local state: category=" + category + ", reason=[" + reason
+                + "]");
     }
 }

@@ -20,6 +20,7 @@ import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 import org.apache.thrift.transport.TTransportException;
+import org.hamcrest.core.IsEqual;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -85,7 +86,7 @@ public class ScribeAppenderTest {
 
     @Test
     public void testDefaultConfiguration() {
-        validateConfiguration("default", "127.0.0.1", 1463, null);
+        validateConfiguration("default", "127.0.0.1", 1463, null, 1);
     }
 
     @Test
@@ -147,8 +148,9 @@ public class ScribeAppenderTest {
         appender.setRemoteHost("remoteHost");
         appender.setRemotePort(1);
         appender.setLocalHostname("localHostname");
+        appender.setStackTraceDepth(0);
 
-        validateConfiguration("category", "remoteHost", 1, "localHostname");
+        validateConfiguration("category", "remoteHost", 1, "localHostname", 0);
     }
 
     private void append(final String message) {
@@ -171,9 +173,8 @@ public class ScribeAppenderTest {
 
         appender.setLocalHostname("localHostname");
         Mockito.when(
-                mockScribeIface.Log(Matchers
-                        .argThat(new LogEntryMatcher(category, "localHostname", Level.INFO, message)))).thenReturn(
-                resultCode);
+                mockScribeIface.Log(Matchers.argThat(new LogEntryMatcher(category, new IsEqual<String>(
+                        "[localHostname] INFO - " + message))))).thenReturn(resultCode);
     }
 
     private void startService() throws TTransportException, IOException {
@@ -215,12 +216,13 @@ public class ScribeAppenderTest {
     }
 
     private void validateConfiguration(final String category, final String remoteHost, final int remotePort,
-            final String localHostname) {
+            final String localHostname, final int stackTraceDepth) {
 
         Assert.assertEquals(category, appender.getCategory());
         Assert.assertEquals(remoteHost, appender.getRemoteHost());
         Assert.assertEquals(remotePort, appender.getRemotePort());
         Assert.assertEquals(localHostname, appender.getLocalHostname());
+        Assert.assertEquals(stackTraceDepth, appender.getStackTraceDepth());
     }
 
     /**
