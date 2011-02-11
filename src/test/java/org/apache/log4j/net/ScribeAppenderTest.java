@@ -20,12 +20,14 @@ import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 import org.apache.thrift.transport.TTransportException;
+import org.hamcrest.Matcher;
 import org.hamcrest.core.IsEqual;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.mockito.internal.matchers.StartsWith;
 
 import com.facebook.scribe.thrift.ResultCode;
 import com.facebook.scribe.thrift.scribe;
@@ -133,12 +135,28 @@ public class ScribeAppenderTest {
 
         startService();
 
-        setupScribeMock("default", "test message", ResultCode.TRY_LATER);
+        setupScribeMock("test message", ResultCode.TRY_LATER);
         append("test message");
 
         stopService();
 
         Mockito.verify(mockErrorHandler).error("DROP - TRY_LATER: [localHostname] INFO - test message");
+    }
+
+    @Test
+    public void testRemoteAppend_WithException() throws IOException, TException {
+
+        startService();
+
+        setupScribeMock(
+                "default",
+                new StartsWith(
+                        "[localHostname] INFO - test message {java.lang.Exception: test exception message\tat org.apache.log4j.net.ScribeAppenderTest.testRemoteAppend_WithException"),
+                ResultCode.OK);
+
+        append("test message", new Exception("test exception message"));
+
+        stopService();
     }
 
     @Test
@@ -165,16 +183,20 @@ public class ScribeAppenderTest {
     }
 
     private void setupScribeMock(final String message) throws TException {
-        setupScribeMock("default", message, ResultCode.OK);
+        setupScribeMock(message, ResultCode.OK);
     }
 
-    private void setupScribeMock(final String category, final String message, final ResultCode resultCode)
-            throws TException {
+    private void setupScribeMock(final String category, final Matcher<String> messageMatcher,
+            final ResultCode resultCode) throws TException {
 
         appender.setLocalHostname("localHostname");
-        Mockito.when(
-                mockScribeIface.Log(Matchers.argThat(new LogEntryMatcher(category, new IsEqual<String>(
-                        "[localHostname] INFO - " + message))))).thenReturn(resultCode);
+
+        Mockito.when(mockScribeIface.Log(Matchers.argThat(new LogEntryMatcher(category, messageMatcher)))).thenReturn(
+                resultCode);
+    }
+
+    private void setupScribeMock(final String message, final ResultCode resultCode) throws TException {
+        setupScribeMock("default", new IsEqual<String>("[localHostname] INFO - " + message), resultCode);
     }
 
     private void startService() throws TTransportException, IOException {

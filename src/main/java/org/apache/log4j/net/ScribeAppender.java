@@ -197,13 +197,6 @@ public class ScribeAppender extends AppenderSkeleton {
             // first n lines of stack trace only
             for (int i = 0; i < stackTraceDepth + 1; i++) {
                 sb.append(stackTraceArray[i]);
-
-                if (i <= stackTraceDepth) {
-
-                    // separate stack trace with something other than newline
-                    // newlines will hoop us in Hadoop if we process per line
-                    sb.append('|');
-                }
             }
 
             stackTrace = sb.toString();
