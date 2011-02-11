@@ -51,4 +51,4 @@ Configuration
 	log4j.appender.scribe.remoteHost=127.0.0.1
 	log4j.appender.scribe.remotePort=1463
 	log4j.appender.scribe.localHostname=app01.host.com
-	log4j.appender.scribe.strackTraceDepth=1
+	log4j.appender.scribe.stackTraceDepth=1
