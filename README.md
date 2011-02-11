@@ -1,5 +1,7 @@
-Scribe log4j Appender
+Log4j Scribe Appender
 ===
+
+A Scribe appender for Log4j allowing log events to be sent to a local or remote Scribe instance. This is probably best used with an AsyncAppender wrapped around it and also with a backup appender defined for messages that are dropped.
 
 History
 ---
