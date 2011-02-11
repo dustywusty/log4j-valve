@@ -142,7 +142,7 @@ public class ScribeAppender extends AppenderSkeleton {
         return remoteHost;
     }
 
-    public Object getRemotePort() {
+    public int getRemotePort() {
         return remotePort;
     }
 
