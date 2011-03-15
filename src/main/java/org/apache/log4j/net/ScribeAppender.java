@@ -94,8 +94,6 @@ public class ScribeAppender extends AppenderSkeleton {
             return;
         }
 
-        findAndSetLocalHostnameIfNeeded();
-
         try {
             // log it to the client
             List<LogEntry> logEntries = new ArrayList<LogEntry>(1);
@@ -202,10 +200,7 @@ public class ScribeAppender extends AppenderSkeleton {
             stackTrace = sb.toString();
         }
 
-        // no null local hostnames, just leave empty if can't be found
-        if (localHostname == null) {
-            localHostname = "";
-        }
+        findAndSetLocalHostnameIfNeeded();
 
         // build log message to send with or without stack trace
         if (stackTrace == null) {
@@ -273,6 +268,7 @@ public class ScribeAppender extends AppenderSkeleton {
                 localHostname = InetAddress.getLocalHost().getCanonicalHostName();
             } catch (UnknownHostException e) {
                 // can't get hostname
+                localHostname = "";
             }
         }
     }
