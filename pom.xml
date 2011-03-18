@@ -54,6 +54,15 @@
             <version>1.6.1</version>
         </dependency>
 
+        <!-- TOMCAT INTEGRATION -->
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>catalina</artifactId>
+            <version>6.0.20</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+
         <!-- STANDARD -->
         <dependency>
             <groupId>log4j</groupId>
