@@ -1,7 +1,7 @@
 Log4j Scribe Appender
 ===
 
-A Scribe appender for Log4j allowing log events to be sent to a local or remote Scribe instance. This is probably best used with an `AsyncAppender` wrapped around it (if you are performance crazy). You should definitely also look into setting a backup appender for messages that are dropped, so you can recover them later through some other means (if you are super paranoid about losing messages).
+A Scribe appender for Log4j allowing log events to be sent to a local or remote Scribe instance. This is probably best used with an `AsyncAppender` wrapped around it (if you are performance crazy). You should definitely also set an error handling appender for errors from the Scribe appender and messages that are dropped, so you can recover them later through some other means (if you are super paranoid about losing messages).
 
 History
 ---
@@ -44,6 +44,9 @@ Configuration
 	# Scribe appender
 	log4j.appender.scribe=org.apache.log4j.net.ScribeAppender
 
+    # error handling appender - all errors and dropped messages are sent to this appender
+    log4j.appender.scribe.ErrorHandler.appender-ref=stdout
+
 	# do NOT use a trailing %n unless you want a newline to be transmitted to Scribe after every message
 	log4j.appender.scribe.layout=org.apache.log4j.PatternLayout
 	log4j.appender.scribe.layout.ConversionPattern=%d{ISO8601} %m
@@ -62,9 +65,10 @@ Tomcat Logging
 Logging to log4j in Tomcat requires a few changes. Please read the [guide](http://tomcat.apache.org/tomcat-6.0-doc/logging.html#Using_Log4j) provided on the Tomcat site. What this does not cover however, is how to get Tomcat to send access logging to log4j. By default, Tomcat ships with the [AccessLogValve](http://tomcat.apache.org/tomcat-6.0-doc/config/valve.html#Access_Log_Valve) which manages logging, file rolling, etc. internally without the use of a logging framework. To use log4j and in turn Scribe for access logging, you will need to ensure that you have followed a few steps:
 
  * Tomcat's [log4j guide](http://tomcat.apache.org/tomcat-6.0-doc/logging.html#Using_Log4j), putting all the jars in the right places
- * Include the following additional jars in Tomcat's `lib` directory (these are also defined in the Maven pom):
+ * Include the following additional jars in Tomcat's `lib` directory (most of these are also defined in the Maven pom):
   * `thrift-0.6.0.jar`
   * `slf4j-log4j12-1.6.1.jar`
+  * `slf4j-api-1.6.1.jar`
   * `log4j-scribe-appender-N.jar` (that is, this source after it has been compiled and packaged)
  * Configure your Tomcat's `server.xml` to use the `Log4JAccessLogValve`
  * Configure your Tomcat's `log4j.properties` for the access logging (to file and/or Scribe)
@@ -121,6 +125,7 @@ The following is a sample, corresponding `lib/log4j.properties` configuration:
     log4j.appender.ACCESS.layout.ConversionPattern=%m%n
 
 	log4j.appender.SCRIBE_ACCESS=org.apache.log4j.net.ScribeAppender
+	log4j.appender.SCRIBE_ACCESS.ErrorHandler.appender-ref=CATALINA
 	log4j.appender.SCRIBE_ACCESS.layout=org.apache.log4j.PatternLayout
 	log4j.appender.SCRIBE_ACCESS.layout.ConversionPattern=%d{ISO8601} %m
 	log4j.appender.SCRIBE_ACCESS.category=tomcat.access
