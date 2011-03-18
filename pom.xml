@@ -6,7 +6,7 @@
 
     <groupId>org.apache.log4j</groupId>
     <artifactId>log4j-scribe-appender</artifactId>
-    <version>4-SNAPSHOT</version>
+    <version>4</version>
 
     <name>Log4j Scribe Appender</name>
     <url>http://github.com/joshdevins/log4j-scribe-appender</url>
