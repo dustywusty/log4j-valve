@@ -61,13 +61,13 @@ Tomcat Logging
 
 Logging to log4j in Tomcat requires a few changes. Please read the [guide](http://tomcat.apache.org/tomcat-6.0-doc/logging.html#Using_Log4j) provided on the Tomcat site. What this does not cover however, is how to get Tomcat to send access logging to log4j. By default, Tomcat ships with the [AccessLogValve](http://tomcat.apache.org/tomcat-6.0-doc/config/valve.html#Access_Log_Valve) which manages logging, file rolling, etc. internally without the use of a logging framework. To use log4j and in turn Scribe for access logging, you will need to ensure that you have followed a few steps:
 
- * Tomcat's [log4 guide](http://tomcat.apache.org/tomcat-6.0-doc/logging.html#Using_Log4j), putting all the jars in the right places
- * Include the following jars in Tomcat's `lib` directory:
-  * `slf4j-log4j12-1.6.1.jar`
+ * Tomcat's [log4j guide](http://tomcat.apache.org/tomcat-6.0-doc/logging.html#Using_Log4j), putting all the jars in the right places
+ * Include the following additional jars in Tomcat's `lib` directory (these are also defined in the Maven pom):
   * `thrift-0.6.0.jar`
-  * `log4j-scribe-appender-X.jar` (that is, this source after it has been compiled and packaged)
+  * `slf4j-log4j12-1.6.1.jar`
+  * `log4j-scribe-appender-N.jar` (that is, this source after it has been compiled and packaged)
  * Configure your Tomcat's `server.xml` to use the `Log4JAccessLogValve`
- * Configure your Tomcat's `log4j.properties` to log as per the logger you set in `server.xml`
+ * Configure your Tomcat's `log4j.properties` for the access logging (to file and/or Scribe)
 
 The following is a sample `conf/settings.xml` configuration:
 
