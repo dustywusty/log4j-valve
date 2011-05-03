@@ -1,0 +1,3 @@
+5/3/11 6:07:01 PM (thread 0 run 0): Aborted run due to Jython exception: AttributeError: append [calling TestRunner]
+AttributeError: append
+	File "./scribe.py", line 27, in __call__
