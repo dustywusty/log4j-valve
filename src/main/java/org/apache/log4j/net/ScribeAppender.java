@@ -54,6 +54,10 @@ import com.facebook.scribe.thrift.scribe.Client;
  */
 public class ScribeAppender extends AppenderSkeleton {
 
+    public static enum ERROR {
+        GENERAL, DROP_NO_CONNECTION, DROP_TRY_LATER;
+    }
+
     public static final String DEFAULT_REMOTE_HOST = "127.0.0.1";
 
     public static final int DEFAULT_REMOTE_PORT = 1463;
@@ -77,23 +81,32 @@ public class ScribeAppender extends AppenderSkeleton {
     private TFramedTransport transport;
 
     /**
-     * Appends a log message to remote Scribe server. This is currently made thread safe by synchronizing this method,
-     * however this is not very efficient and should be refactored.
-     * 
-     * TODO: Refactor for better effeciency and thread safety
+     * Delegates to {@link #appendAndGetError(LoggingEvent)}
      */
     @Override
     public synchronized void append(final LoggingEvent event) {
+        appendAndGetError(event);
+    }
+
+    /**
+     * Appends a log message to remote Scribe server. This is currently made thread safe by synchronizing this method,
+     * however this is not very efficient and should be refactored. Method will return null if no errors ocurred,
+     * otherwise the specific error will be returned.
+     * 
+     * TODO: Refactor for better effeciency and thread safety
+     */
+    public ERROR appendAndGetError(final LoggingEvent event) {
 
         String message = buildMessage(event);
 
         boolean connected = connectIfNeeded();
 
         if (!connected) {
-            getErrorHandler().error("DROP - no connection: " + message);
-            return;
+            getErrorHandler().error("DROP - no connection: " + message, null, ERROR.DROP_NO_CONNECTION.ordinal());
+            return ERROR.DROP_NO_CONNECTION;
         }
 
+        ERROR error = null;
         try {
             // log it to the client
             List<LogEntry> logEntries = new ArrayList<LogEntry>(1);
@@ -105,16 +118,21 @@ public class ScribeAppender extends AppenderSkeleton {
             if (ResultCode.TRY_LATER == resultCode) {
 
                 // nicely formatted for batch processing
-                getErrorHandler().error("DROP - TRY_LATER: " + message);
+                getErrorHandler().error("DROP - TRY_LATER: " + message, null, ERROR.DROP_TRY_LATER.ordinal());
+                error = ERROR.DROP_TRY_LATER;
             }
 
         } catch (TException e) {
             transport.close();
             handleError("TException on log attempt", e);
+            error = ERROR.GENERAL;
 
         } catch (Exception e) {
             handleError("Unhandled Exception on log attempt", e);
+            error = ERROR.GENERAL;
         }
+
+        return error;
     }
 
     /**
@@ -278,6 +296,6 @@ public class ScribeAppender extends AppenderSkeleton {
         // error code is not used
         getErrorHandler().error(
                 "Failure in ScribeAppender: name=[" + name + "], failure=[" + failure + "], exception=["
-                        + e.getMessage() + "]");
+                        + e.getMessage() + "]", null, ERROR.GENERAL.ordinal());
     }
 }

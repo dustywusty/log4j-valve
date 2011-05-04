@@ -10,6 +10,7 @@ import junit.framework.Assert;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.apache.log4j.net.ScribeAppender.ERROR;
 import org.apache.log4j.spi.ErrorHandler;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.thrift.TException;
@@ -80,10 +81,13 @@ public class ScribeAppenderTest {
         appender.setRemotePort(1);
         appender.setLocalHostname("localHostname");
 
-        append("test message");
+        ERROR error = append("test message");
 
-        Mockito.verify(mockErrorHandler).error("DROP - no connection: [localHostname] INFO - test message");
-        Mockito.verify(mockErrorHandler).error(Matchers.contains("Connection refused"));
+        Mockito.verify(mockErrorHandler).error("DROP - no connection: [localHostname] INFO - test message", null,
+                ERROR.DROP_NO_CONNECTION.ordinal());
+        Mockito.verify(mockErrorHandler).error(Matchers.contains("Connection refused"), (Exception) Matchers.isNull(),
+                Matchers.eq(ERROR.GENERAL.ordinal()));
+        Assert.assertEquals(ERROR.DROP_NO_CONNECTION, error);
     }
 
     @Test
@@ -97,7 +101,7 @@ public class ScribeAppenderTest {
         startService();
 
         setupScribeMock("test message");
-        append("test message");
+        Assert.assertNull(append("test message"));
 
         stopService();
     }
@@ -136,11 +140,13 @@ public class ScribeAppenderTest {
         startService();
 
         setupScribeMock("test message", ResultCode.TRY_LATER);
-        append("test message");
+        ERROR error = append("test message");
 
         stopService();
 
-        Mockito.verify(mockErrorHandler).error("DROP - TRY_LATER: [localHostname] INFO - test message");
+        Mockito.verify(mockErrorHandler).error("DROP - TRY_LATER: [localHostname] INFO - test message", null,
+                ERROR.DROP_TRY_LATER.ordinal());
+        Assert.assertEquals(ERROR.DROP_TRY_LATER, error);
     }
 
     @Test
@@ -171,15 +177,15 @@ public class ScribeAppenderTest {
         validateConfiguration("category", "remoteHost", 1, "localHostname", 0);
     }
 
-    private void append(final String message) {
-        append(message, null);
+    private ERROR append(final String message) {
+        return append(message, null);
     }
 
-    private void append(final String message, final Throwable throwable) {
+    private ERROR append(final String message, final Throwable throwable) {
 
         LoggingEvent event = new LoggingEvent("org.apache.log4j.net.ScribeAppenderTest", LOGGER, Level.INFO, message,
                 throwable);
-        appender.append(event);
+        return appender.appendAndGetError(event);
     }
 
     private void setupScribeMock(final String message) throws TException {
