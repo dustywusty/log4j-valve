@@ -34,30 +34,31 @@ You will need the following libraries installed in your Maven repository since t
 Configuration
 ---
 
-	log4j.rootLogger=INFO, stdout, scribe
+    log4j.rootLogger=INFO, stdout, scribe
 	
-	# stdout/console appender
-	log4j.appender.stdout=org.apache.log4j.ConsoleAppender
-	log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
-	log4j.appender.stdout.layout.ConversionPattern=%5p [%t] (%F:%L) - %m%n
+    # stdout/console appender
+    log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+    log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+    log4j.appender.stdout.layout.ConversionPattern=%5p [%t] (%F:%L) - %m%n
 
-	# Scribe appender
-	log4j.appender.scribe=org.apache.log4j.net.ScribeAppender
+    # Scribe appender
+    log4j.appender.scribe=org.apache.log4j.net.ScribeAppender
 
     # error handling appender - all errors and dropped messages are sent to this appender
     log4j.appender.scribe.ErrorHandler.appender-ref=stdout
 
-	# do NOT use a trailing %n unless you want a newline to be transmitted to Scribe after every message
-	log4j.appender.scribe.layout=org.apache.log4j.PatternLayout
-	log4j.appender.scribe.layout.ConversionPattern=%d{ISO8601} %m
+    # do NOT use a trailing %n unless you want a newline to be transmitted to Scribe after every message
+    # of course, this depends on your Scribe configuration as well, if you are having it append newline or not
+    log4j.appender.scribe.layout=org.apache.log4j.PatternLayout
+    log4j.appender.scribe.layout.ConversionPattern=%d{ISO8601} %m%n
 
-	# optional properties
-	# canonical hostname will be looked up if not provided in localHostname
-	log4j.appender.scribe.category=application.appender.category
-	log4j.appender.scribe.remoteHost=127.0.0.1
-	log4j.appender.scribe.remotePort=1463
-	log4j.appender.scribe.localHostname=app01.host.com
-	log4j.appender.scribe.stackTraceDepth=1
+    # optional properties
+    # canonical hostname will be looked up if not provided in localHostname
+    log4j.appender.scribe.category=application.appender.category
+    log4j.appender.scribe.remoteHost=127.0.0.1
+    log4j.appender.scribe.remotePort=1463
+    log4j.appender.scribe.localHostname=app01.host.com
+    log4j.appender.scribe.stackTraceDepth=1
 
 Tomcat Logging
 ---
@@ -124,11 +125,11 @@ The following is a sample, corresponding `lib/log4j.properties` configuration:
     log4j.appender.ACCESS.layout=org.apache.log4j.PatternLayout
     log4j.appender.ACCESS.layout.ConversionPattern=%m%n
 
-	log4j.appender.SCRIBE_ACCESS=org.apache.log4j.net.ScribeAppender
-	log4j.appender.SCRIBE_ACCESS.ErrorHandler.appender-ref=CATALINA
-	log4j.appender.SCRIBE_ACCESS.layout=org.apache.log4j.PatternLayout
-	log4j.appender.SCRIBE_ACCESS.layout.ConversionPattern=%d{ISO8601} %m
-	log4j.appender.SCRIBE_ACCESS.category=tomcat.access
+    log4j.appender.SCRIBE_ACCESS=org.apache.log4j.net.ScribeAppender
+    log4j.appender.SCRIBE_ACCESS.ErrorHandler.appender-ref=CATALINA
+    log4j.appender.SCRIBE_ACCESS.layout=org.apache.log4j.PatternLayout
+    log4j.appender.SCRIBE_ACCESS.layout.ConversionPattern=%d{ISO8601} %m
+    log4j.appender.SCRIBE_ACCESS.category=tomcat.access
 
     log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
     log4j.appender.CONSOLE.encoding=UTF-8
