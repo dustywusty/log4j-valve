@@ -140,7 +140,6 @@ public class ScribeAppender extends AppenderSkeleton {
      */
     @Override
     public synchronized void close() {
-
         if (isConnected()) {
             transport.close();
         }
@@ -175,7 +174,6 @@ public class ScribeAppender extends AppenderSkeleton {
     }
 
     public void setCategory(final String category) {
-
         Validate.notEmptyString(category, "Category must not be empty");
         this.category = category;
     }
@@ -185,19 +183,16 @@ public class ScribeAppender extends AppenderSkeleton {
     }
 
     public void setRemoteHost(final String remoteHost) {
-
-        Validate.notEmptyString(category, "Remote host must not be empty");
+        Validate.notEmptyString(remoteHost, "Remote host must not be empty");
         this.remoteHost = remoteHost;
     }
 
     public void setRemotePort(final int remotePort) {
-
         Validate.positiveInteger(remotePort, "Remote port must at least be a positive integer");
         this.remotePort = remotePort;
     }
 
     public void setStackTraceDepth(final int stackTraceDepth) {
-
         Validate.positiveInteger(stackTraceDepth, "Stack trace depth must be a positive integer");
         this.stackTraceDepth = stackTraceDepth;
     }
@@ -234,7 +229,6 @@ public class ScribeAppender extends AppenderSkeleton {
      * @return connection success
      */
     private boolean connectIfNeeded() {
-
         if (isConnected()) {
             return true;
         }
@@ -268,7 +262,6 @@ public class ScribeAppender extends AppenderSkeleton {
      * Thrift boilerplate connection code. No error handling is attempted and all excetions are passed back up.
      */
     private void establishConnection() throws TTransportException, UnknownHostException, IOException {
-
         TSocket sock = new TSocket(new Socket(remoteHost, remotePort));
         transport = new TFramedTransport(sock);
 
@@ -280,7 +273,6 @@ public class ScribeAppender extends AppenderSkeleton {
      * If no {@link #localHostname} has been set, this will attempt to set it.
      */
     private void findAndSetLocalHostnameIfNeeded() {
-
         if (localHostname == null) {
             try {
                 localHostname = InetAddress.getLocalHost().getCanonicalHostName();
@@ -292,7 +284,6 @@ public class ScribeAppender extends AppenderSkeleton {
     }
 
     private void handleError(final String failure, final Exception e) {
-
         // error code is not used
         getErrorHandler().error(
                 "Failure in ScribeAppender: name=[" + name + "], failure=[" + failure + "], exception=["
