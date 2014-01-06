@@ -24,13 +24,6 @@ History
  * added test cases
  * added Tomcat log4j access log valve
 
-Building
----
-
-You will need the following libraries installed in your Maven repository since they don't exist in the central repo:
-
- * [Thrift](http://thrift.apache.org) - 0.6.0
-
 Configuration
 ---
 
