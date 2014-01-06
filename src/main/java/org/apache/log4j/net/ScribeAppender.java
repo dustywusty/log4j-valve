@@ -201,16 +201,19 @@ public class ScribeAppender extends AppenderSkeleton {
 
         String stackTrace = null;
         if (event.getThrowableInformation() != null) {
-
-            StringBuilder sb = new StringBuilder();
             String[] stackTraceArray = event.getThrowableInformation().getThrowableStrRep();
 
-            // first n lines of stack trace only
-            for (int i = 0; i < stackTraceDepth + 1; i++) {
-                sb.append(stackTraceArray[i]);
-            }
+            if (stackTraceArray != null && stackTraceArray.length > 0) {
+                StringBuilder sb = new StringBuilder();
 
-            stackTrace = sb.toString();
+                // first n lines of stack trace only
+                // recall that first is the root and depth refers to the cause
+                for (int i = 0; i < stackTraceDepth + 1; i++) {
+                    sb.append(stackTraceArray[i]);
+                }
+
+                stackTrace = sb.toString();
+            }
         }
 
         findAndSetLocalHostnameIfNeeded();
