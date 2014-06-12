@@ -1,3 +1,4 @@
+test
 Log4j Scribe Appender
 ===
 
