@@ -23,9 +23,9 @@ import org.omg.PortableInterceptor.RequestInfo;
  * allow us to send access logging over Scribe using the {@link org.apache.log4j.net.ScribeAppender}. This will log to
  * log4j at the INFO level. Note that thread name field is currently not supported. The logger's name is set using a
  * property of the valve.
- * 
+ *
  * @see AccessLogValve AccessLogValve for details on formatting
- * 
+ *
  * @author Josh Devins
  */
 public final class Log4JAccessLogValve extends BaseValve {
@@ -53,8 +53,8 @@ public final class Log4JAccessLogValve extends BaseValve {
         }
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
-            long length = response.getContentCountLong();
+                               final long time) {
+            long length = response.getContentWritten();
             if (length <= 0 && conversion) {
                 buf.append('-');
             } else {
@@ -75,7 +75,7 @@ public final class Log4JAccessLogValve extends BaseValve {
         }
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             String value = "-";
             Cookie[] c = request.getCookies();
             if (c != null) {
@@ -100,7 +100,7 @@ public final class Log4JAccessLogValve extends BaseValve {
         private String currentDateString = null;
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             if (currentDate != date) {
                 synchronized (this) {
                     if (currentDate != date) {
@@ -141,7 +141,7 @@ public final class Log4JAccessLogValve extends BaseValve {
         }
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             if (millis) {
                 buf.append(time);
             } else {
@@ -169,7 +169,7 @@ public final class Log4JAccessLogValve extends BaseValve {
         }
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             String value = request.getHeader(header);
             if (value == null) {
                 buf.append('-');
@@ -185,7 +185,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     protected class HostElement implements AccessLogElement {
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             buf.append(request.getRemoteHost());
         }
     }
@@ -196,7 +196,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     protected class HttpStatusCodeElement implements AccessLogElement {
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             if (response != null) {
                 buf.append(response.getStatus());
             } else {
@@ -213,7 +213,7 @@ public final class Log4JAccessLogValve extends BaseValve {
         private String value = null;
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             if (value == null) {
                 synchronized (this) {
                     try {
@@ -233,7 +233,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     protected class LocalPortElement implements AccessLogElement {
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             buf.append(request.getServerPort());
         }
     }
@@ -244,7 +244,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     protected class LocalServerNameElement implements AccessLogElement {
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             buf.append(request.getServerName());
         }
     }
@@ -255,7 +255,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     protected class LogicalUserNameElement implements AccessLogElement {
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             buf.append('-');
         }
     }
@@ -266,7 +266,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     protected class MethodElement implements AccessLogElement {
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             if (request != null) {
                 buf.append(request.getMethod());
             }
@@ -279,7 +279,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     protected class ProtocolElement implements AccessLogElement {
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             buf.append(request.getProtocol());
         }
     }
@@ -290,7 +290,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     protected class QueryElement implements AccessLogElement {
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             String query = null;
             if (request != null) {
                 query = request.getQueryString();
@@ -308,7 +308,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     protected class RemoteAddrElement implements AccessLogElement {
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             buf.append(request.getRemoteAddr());
         }
     }
@@ -325,7 +325,7 @@ public final class Log4JAccessLogValve extends BaseValve {
         }
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             Object value = null;
             if (request != null) {
                 value = request.getAttribute(header);
@@ -350,7 +350,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     protected class RequestElement implements AccessLogElement {
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             if (request != null) {
                 buf.append(request.getMethod());
                 buf.append(' ');
@@ -373,7 +373,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     protected class RequestURIElement implements AccessLogElement {
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             if (request != null) {
                 buf.append(request.getRequestURI());
             } else {
@@ -394,9 +394,9 @@ public final class Log4JAccessLogValve extends BaseValve {
         }
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             if (null != response) {
-                String[] values = response.getHeaderValues(header);
+                String[] values = response.getHeaders(header).toArray(new String[response.getHeaders(header).size()]);
                 if (values.length > 0) {
                     for (int i = 0; i < values.length; i++) {
                         String string = values[i];
@@ -424,7 +424,7 @@ public final class Log4JAccessLogValve extends BaseValve {
         }
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             Object value = null;
             if (null != request) {
                 HttpSession sess = request.getSession(false);
@@ -452,7 +452,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     protected class SessionIdElement implements AccessLogElement {
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             if (request != null) {
                 if (request.getSession(false) != null) {
                     buf.append(request.getSessionInternal(false).getIdInternal());
@@ -477,7 +477,7 @@ public final class Log4JAccessLogValve extends BaseValve {
         }
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             buf.append(str);
         }
     }
@@ -488,7 +488,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     protected class ThreadNameElement implements AccessLogElement {
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             RequestInfo info = (RequestInfo) request.getCoyoteRequest().getRequestProcessor();
             if (info != null) {
                 buf.append(((org.apache.coyote.RequestInfo) info).getWorkerThreadName());
@@ -504,7 +504,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     protected class UserElement implements AccessLogElement {
 
         public void addElement(final StringBuffer buf, final Date date, final Request request, final Response response,
-                final long time) {
+                               final long time) {
             if (request != null) {
                 String value = request.getRemoteUser();
                 if (value != null) {
@@ -627,12 +627,12 @@ public final class Log4JAccessLogValve extends BaseValve {
     /**
      * Log a message summarizing the specified request and response, according
      * to the format specified by the <code>pattern</code> property.
-     * 
+     *
      * @param request
      *        Request being processed
      * @param response
      *        Response being processed
-     * 
+     *
      * @exception IOException
      *            if an input/output error has occurred
      * @exception ServletException
@@ -677,7 +677,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     /**
      * Set the ServletRequest.attribute to look for to perform
      * conditional logging. Set to null to log everything.
-     * 
+     *
      * @param condition
      *        Set to null to log everything
      */
@@ -699,7 +699,7 @@ public final class Log4JAccessLogValve extends BaseValve {
 
     /**
      * Set the format pattern, first translating any recognized alias.
-     * 
+     *
      * @param pattern
      *        The new pattern
      */
@@ -800,7 +800,7 @@ public final class Log4JAccessLogValve extends BaseValve {
 
     /**
      * Log the specified message to log4j at the INFO level.
-     * 
+     *
      * @param message
      *        Message to be logged
      */
@@ -912,7 +912,7 @@ public final class Log4JAccessLogValve extends BaseValve {
      * second since a new Date was created, this method simply gives out the
      * same Date again so that the system doesn't spend time creating Date
      * objects unnecessarily.
-     * 
+     *
      * @return Date
      */
     private Date getDate() {
@@ -943,7 +943,7 @@ public final class Log4JAccessLogValve extends BaseValve {
     /**
      * Return the month abbreviation for the specified month, which must
      * be a two-digit String.
-     * 
+     *
      * @param month
      *        Month number ("01" .. "12").
      */
