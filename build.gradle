@@ -1,0 +1,14 @@
+apply plugin: 'idea'
+apply plugin: 'java'
+
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'log4j:log4j:1.2.17'
+    compile 'org.apache.tomcat:coyote:6.0.41'
+    compile 'org.apache.tomcat:tomcat-catalina:7.0.54'
+}
