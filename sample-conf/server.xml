@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Server port="8005" shutdown="SHUTDOWN">
+
+  <Service name="Catalina">
+    <Connector port="8080" protocol="HTTP/1.1" connectionTimeout="20000" redirectPort="8443" />
+
+    <Engine name="Catalina" defaultHost="localhost">
+
+      <Host name="localhost"  appBase="webapps"
+            unpackWARs="true" autoDeploy="true"
+            xmlValidation="false" xmlNamespaceAware="false">
+
+        <!-- use log4j for access logging -->
+        <!-- set the logger name to access, this will need to match the logger name in log4j.properties in lib -->
+        <!-- use the Apache common log format -->
+        <Valve className="org.apache.catalina.valves.Log4JAccessLogValve"
+               loggerName="access" pattern="common" resolveHosts="false" />
+      </Host>
+    </Engine>
+  </Service>
+</Server>
