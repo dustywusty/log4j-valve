@@ -1,7 +1,5 @@
-Log4j Scribe Appender
-===
+Log4j Valve
 
-A Scribe appender for Log4j allowing log events to be sent to a local or remote Scribe instance. This is probably best used with an `AsyncAppender` wrapped around it (if you are performance crazy). You should definitely also set an error handling appender for errors from the Scribe appender and messages that are dropped, so you can recover them later through some other means (if you are super paranoid about losing messages).
 
 History
 ---
@@ -24,6 +22,13 @@ History
  * added test cases
  * added Tomcat log4j access log valve
 
+[Dustin Clark](https://github.com/clarkda/log4j-valve)
+ 
+ * Stripped out scribe functionality
+ * Project now provides ONLY log4j access logging for Tomcat 7
+ * Updated Josh's code for the new lifecycle / catalina APIs
+ * Stripped out maven in favor of gradle build support
+ 
 Configuration
 ---
 
