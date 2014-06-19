@@ -32,8 +32,8 @@ Installation
 * ..
 
 
-### Acknowledgements 
-
+Acknowledgements 
+-------------
 * [Alex Loddengaard](http://github.com/alexlod/scribe-log4j-appender)
 * [Chris Goffinet](http://github.com/lenn0x/Scribe-log4j-Appender)
 * [Josh Devins](http://github.com/joshdevins/Scribe-log4j-Appender)
