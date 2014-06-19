@@ -1,4 +1,4 @@
-Helios
+Log4j-valve
 ======
 
 [![Build Status](https://travis-ci.org/spotify/helios.svg?branch=master)](https://travis-ci.org/spotify/helios)
