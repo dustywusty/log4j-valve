@@ -1,7 +1,7 @@
 Log4j-valve
 ======
 
-[![Build Status](https://travis-ci.org/spotify/helios.svg?branch=master)](https://travis-ci.org/spotify/helios)
+[![Build Status](https://travis-ci.org/clarkda/log4j-valve.svg?branch=master)](https://travis-ci.org/clarkda/log4j-valve)
 
 Log4j-access-valve is a Tomcat valve that enables ACCESS logging via Log4j
 
