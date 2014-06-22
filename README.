@@ -33,14 +33,22 @@ Installation
 
 Installing Log4j
 -------------
- 
- * Create a bin/ & lib/ directory in /var/lib/tomcat7
- * Add tomcat-juli.jar to our bin/ directory
- * Add tomcat-juli-adapters.jar to our lib/ directory
- * Add log4j-1.2.<version>.jar to our lib/ directory
- * Add a log4j.properties conf to lib/ -- you can use the example file
- * Move the old logging.properties conf out of the way -- /var/lib/tomcat7/conf/logging.properties
 
+```
+mkdir -p /var/lib/tomcat7/lib /var/lib/tomcat7/bin && \
+    wget -P /var/lib/tomcat7/bin \
+      http://mirror.metrocast.net/apache/tomcat/tomcat-7/v7.0.54/bin/extras/tomcat-juli.jar && \
+    wget -P /var/lib/tomcat7/lib \
+      http://mirror.metrocast.net/apache/tomcat/tomcat-7/v7.0.54/bin/extras/tomcat-juli-adapters.jar
+
+cd /tmp && \
+    wget http://archive.apache.org/dist/logging/log4j/1.2.16/apache-log4j-1.2.16.tar.gz && \
+    tar -zxvf apache-log4j-1.2.16.tar.gz && \
+    cp apache-log4j-1.2.16/log4j-1.2.16.jar /var/lib/tomcat7/lib/
+    
+mv /var/lib/tomcat7/conf/logging.properties /var/lib/tomcat7/conf/logging.properties.old
+
+````
 
 Acknowledgements 
 -------------
